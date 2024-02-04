@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Better To-Do List</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .todo-container {
+            max-width: 400px;
+            margin: auto;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container todo-container">
+        <section class="section">
+            <h1 class="title is-3">Better To-Do List</h1>
+            <div class="field has-addons">
+                <div class="control is-expanded">
+                    <input class="input" type="text" id="newTodo" placeholder="Add a new task">
+                </div>
+                <div class="control">
+                    <button class="button is-primary" onclick="addTodo()">Add Task</button>
+                </div>
+            </div>
+            <ul class="mt-4" id="todoList"></ul>
+        </section>
+    </div>
+
+    <script>
+        function fetchTodos() {
+            const todos = JSON.parse(localStorage.getItem('todos')) || [];
+            displayTodos(todos);
+        }
+
+        function displayTodos(todos) {
+            const todoList = document.getElementById('todoList');
+            todoList.innerHTML = '';
+
+            todos.forEach((todo, index) => {
+                const listItem = document.createElement('li');
+                listItem.className = 'is-flex';
+                listItem.innerHTML = `
+                    <input class="mr-3" type="checkbox" ${todo.completed ? 'checked' : ''} onchange="updateTodoStatus(${index}, this)">
+                    <span class="${todo.completed ? 'has-text-grey-light' : ''}">${todo.text}</span>
+                `;
+                todoList.appendChild(listItem);
+            });
+        }
+
+        function addTodo() {
+            const newTodoInput = document.getElementById('newTodo');
+            const text = newTodoInput.value.trim();
+
+            if (text !== '') {
+                const todos = JSON.parse(localStorage.getItem('todos')) || [];
+                const newTodo = { text, completed: false };
+                todos.push(newTodo);
+                localStorage.setItem('todos', JSON.stringify(todos));
+                fetchTodos();
+                newTodoInput.value = '';
+            }
+        }
+
+        function updateTodoStatus(index, checkbox) {
+            const todos = JSON.parse(localStorage.getItem('todos')) || [];
+            todos[index].completed = checkbox.checked;
+            localStorage.setItem('todos', JSON.stringify(todos));
+            fetchTodos();
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchTodos);
+    </script>
+</body>
+</html>
